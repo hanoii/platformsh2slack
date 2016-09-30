@@ -1,0 +1,5 @@
+{
+    "require": {
+        "maknz/slack": "^1.7"
+    }
+}
