@@ -32,7 +32,7 @@ This scripts look for a `platformsh2slack-config.php` alongside the `platformsh2
 - create it on another build hook
 - or add it to your repository and then add a line to the build hook to move it to where you cloned this repository. (i.e. /app/public/platformsh2slack)
 
-See the sample file for the required settings: [blob/master/platformsh2slack-config.sample.php](platformsh2slack-config.sample.php)
+See the sample file for the required settings: [platformsh2slack-config.sample.php](platformsh2slack-config.sample.php)
 
 ## Quick test
 

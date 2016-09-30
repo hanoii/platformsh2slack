@@ -36,7 +36,13 @@ if (!empty($platformsh)) {
   $message = $client->createMessage();
 
   $name = $platformsh->payload->user->display_name;
-  $branch = $platformsh->parameters->environment;
+  $branch = 'not-found-on-payload';
+  if (!empty($platformsh->parameters->environment)) {
+    $branch = $platformsh->parameters->environment;
+  }
+  else if (!empty($platformsh->payload->environment->name)) {
+    $branch = $platformsh->payload->environment->name;
+  }
   $project = $platformsh->project;
 
   // Region/project url
@@ -77,6 +83,10 @@ if (!empty($platformsh)) {
 
     case 'environment.delete':
       $text = "$name deleted the branch `$branch` of <$project_url|$project>";
+      break;
+
+    case 'environment.merge':
+      $text = "$name merged branch `{$platformsh->parameters->from}` into `{$platformsh->parameters->into}` of <$project_url|$project>";
       break;
 
     default:
