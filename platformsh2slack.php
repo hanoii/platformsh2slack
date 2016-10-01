@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/vendor/autoload.php';
+
 $config_file = 'platformsh2slack-config.php';
 // Prevent flooding and require config file
 if (!file_exists($config_file) || empty($_GET['token']) || !(include $config_file) || !defined('PLATOFRMSH2SLACK_TOKEN') || $_GET['token'] != PLATOFRMSH2SLACK_TOKEN) {
@@ -7,7 +9,8 @@ if (!file_exists($config_file) || empty($_GET['token']) || !(include $config_fil
   die();
 }
 
-require __DIR__ . '/vendor/autoload.php';
+$show_routes = PLATOFRMSH2SLACK_VERBOSE_ROUTES;
+$show_configurations = PLATOFRMSH2SLACK_VERBOSE_CONFIGURATIONS;
 
 function platformsh_trim_log($str) {
   return trim(preg_replace('/[\n]+[ ]*/s', "\n", $str), "\n ");
@@ -17,25 +20,26 @@ $json = file_get_contents('php://input');
 $platformsh = json_decode($json);
 
 if (!empty($platformsh)) {
-
-  // Instantiate with defaults, so all messages created
-  // will be sent from 'Cyril' and to the #accounting channel
-  // by default. Any names like @regan or #channel will also be linked.
+  // Default settings
   $settings = [
     'username' => 'Platform.sh',
     'channel' => PLATOFRMSH2SLACK_SLACK_CHANNEL,
     'icon' => 'https://pbs.twimg.com/profile_images/515156001591283712/UCMw85fT.png',
   ];
 
-  // Instantiate without defaults
+  // Instantiate slack client
   $client = new Maknz\Slack\Client(
     PLATOFRMSH2SLACK_SLACK_URL,
     $settings
   );
 
+  // Explicitely set slack message
   $message = $client->createMessage();
 
+  // Authora name
   $name = $platformsh->payload->user->display_name;
+
+  // Branch
   $branch = 'not-found-on-payload';
   if (!empty($platformsh->parameters->environment)) {
     $branch = $platformsh->parameters->environment;
@@ -43,6 +47,8 @@ if (!empty($platformsh)) {
   else if (!empty($platformsh->payload->environment->name)) {
     $branch = $platformsh->payload->environment->name;
   }
+
+  // Project
   $project = $platformsh->project;
 
   // Region/project url
@@ -72,13 +78,18 @@ if (!empty($platformsh)) {
     ));
   }
 
+  // Handle webhook
   switch ($platformsh->type) {
     case 'environment.push':
       $text = "$name pushed $commits_count_str to branch `$branch` of <$project_url|$project>";
+      if ($branch == 'master') {
+        $show_configurations = true;
+      }
       break;
 
     case 'environment.branch':
       $text = "$name created a branch `$branch` of <$project_url|$project>";
+      $show_routes = true;
       break;
 
     case 'environment.delete':
@@ -87,6 +98,23 @@ if (!empty($platformsh)) {
 
     case 'environment.merge':
       $text = "$name merged branch `{$platformsh->parameters->from}` into `{$platformsh->parameters->into}` of <$project_url|$project>";
+      break;
+
+    case 'project.domain.update':
+      $text = "$name updated domain `{$platformsh->payload->domain->name}` of <$project_url|$project>";
+      if (!empty($platformsh->payload->domain->ssl->has_certificate)) {
+        $message->attach(array(
+          'title' => 'SSL',
+          'text' => "*CA: * {$platformsh->payload->domain->ssl->ca}\n*Expires: * {$platformsh->payload->domain->ssl->expires_on}",
+          'fallback' => "CA: {$platformsh->payload->domain->ssl->ca}\n",
+          'color' => '#e8e8e8',
+          'mrkdwn_in' => array('text'),
+        ));
+      }
+      break;
+
+    case 'environment.backup':
+      $text = "$name created the snapshot `{$platformsh->payload->backup_name}` from `$branch` of <$project_url|$project>";
       break;
 
     default:
@@ -111,7 +139,7 @@ if (!empty($platformsh)) {
   ));
 
   // Environment configuration
-  if (preg_match('/Environment configuration:(.*)Environment routes/s', $platformsh->log, $matches)) {
+  if ($show_configurations && preg_match('/Environment configuration:(.*)Environment routes/s', $platformsh->log, $matches)) {
     $environment_configuration = platformsh_trim_log($matches[1]);
     $message->attach(array(
       'title' => 'Environment configuration',
@@ -122,7 +150,7 @@ if (!empty($platformsh)) {
   }
 
   // Environment routes
-  if (preg_match('/Environment routes:(.*)/s', $platformsh->log, $matches)) {
+  if ($show_routes && preg_match('/Environment routes:(.*)/s', $platformsh->log, $matches)) {
     $routes = platformsh_trim_log($matches[1]);
     $message->attach(array(
       'title' => 'Environment routes',
@@ -133,5 +161,4 @@ if (!empty($platformsh)) {
   }
 
   $message->send($text);
-
 }

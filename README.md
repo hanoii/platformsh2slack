@@ -25,6 +25,12 @@ hooks:
       )
 ```
 
+You can also specify a tag to the git clone command so that you can track versions:
+
+```bash
+git --branch v0.1 clone https://github.com/hanoii/platformsh2slack.git /app/public/platformsh2slack
+```
+
 ## Config file
 
 This scripts look for a `platformsh2slack-config.php` alongside the `platformsh2slack.php` script, you can either:
@@ -44,7 +50,7 @@ And see `No config or valid token.` in the browser.
 
 ## Token
 
-On of the necessary configuration is a random token you need to define as `PLATOFRMSH2SLACK_TOKEN` in the config file. This is only to prevent possible unauthorized use of the script. Once you define it, you have to add it the url for the integration.
+One of the necessary configuration is a random token you need to define as `PLATOFRMSH2SLACK_TOKEN` in the config file. This is only to prevent possible unauthorized use of the script. Once you define it, you have to add it the url for the integration.
 
 i.e. If you define:
 

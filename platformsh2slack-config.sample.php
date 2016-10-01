@@ -25,3 +25,10 @@ define('PLATOFRMSH2SLACK_SLACK_URL', 'https://hooks.slack.com/services/...');
 // improved.
 define('PLATOFRMSH2SLACK_DEBUG', false);
 
+// Always show environment configurations when present, otherwise will be shown
+// on some specific hooks
+define('PLATOFRMSH2SLACK_VERBOSE_CONFIGURATIONS', false);
+
+// Always show environment routes when present, otherwise will be shown
+// on some specific hooks
+define('PLATOFRMSH2SLACK_VERBOSE_ROUTES', false);
