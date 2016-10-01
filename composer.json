@@ -1,5 +1,6 @@
 {
     "require": {
-        "maknz/slack": "^1.7"
+        "maknz/slack": "^1.7",
+        "symfony/yaml": "^3.1"
     }
 }

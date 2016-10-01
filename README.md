@@ -1,6 +1,6 @@
 # Platform.sh -> Slack incoming webhook adapter
 
-This is a simple php script that translates Platform.sh webhook into a Slack
+This is a simple php script that translates [Platform.sh](https://platform.sh) webhook into a [Slack](http://slack.com/)
 formatted message.
 
 You can install this in your php app container and host it there for your project's specific webhooks.
@@ -32,16 +32,16 @@ git --branch v0.2 clone https://github.com/hanoii/platformsh2slack.git /app/publ
 
 ## Config file
 
-This scripts look for a `platformsh2slack-config.php` alongside the `platformsh2slack.php` script, you can either:
+This scripts look for a `platformsh2slack.yaml` alongside the `platformsh2slack.php` script, you can either:
 
 - create it on another build hook
 - or add it to your repository and then add a line to the build hook to move it to where you cloned this repository. (i.e. /app/public/platformsh2slack)
 
-See the sample file for the required settings: [platformsh2slack-config.sample.php](platformsh2slack-config.sample.php)
+See the sample file for the required settings: [platformsh2slack.sample.yaml](platformsh2slack.sample.yaml)
 
 ## Quick test
 
-If all went ok, you should be able to access your project's url at:
+If all went ok, you should be able to access the script at your project's url:
 
 `http://PROJECTURL/platformsh2slack/platformsh2slack.php`
 
@@ -53,8 +53,8 @@ One of the necessary configuration is a random token you need to define as `PLAT
 
 i.e. If you define:
 
-```php
-define('PLATOFRMSH2SLACK_TOKEN', '1234');
+```yaml
+token: '1234'
 ```
 
 You would use 
@@ -67,7 +67,9 @@ For your integration URL.
 
 Run the following:
 
-`platform integration:add --type=webhook --url="https://PROJECTURL/platformsh2slack/platformsh2slack.php?token=TOKEN"`
+```bash
+platform integration:add --type=webhook --url="https://PROJECTURL/platformsh2slack/platformsh2slack.php?token=TOKEN"
+```
 
 Replacing **PROJECTURL** for your platform route and **TOKEN** with your defined token.
 

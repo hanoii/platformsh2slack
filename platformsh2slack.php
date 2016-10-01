@@ -2,15 +2,31 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-$config_file = 'platformsh2slack-config.php';
-// Prevent flooding and require config file
-if (!file_exists($config_file) || empty($_GET['token']) || !(include $config_file) || !defined('PLATOFRMSH2SLACK_TOKEN') || $_GET['token'] != PLATOFRMSH2SLACK_TOKEN) {
+use Symfony\Component\Yaml\Yaml;
+
+$config_file = 'platformsh2slack.yaml';
+
+// Token simple auth and require config file
+if (!file_exists($config_file)
+  || empty($_GET['token'])
+  || !($config = Yaml::parse(file_get_contents($config_file)))
+  || $_GET['token'] != $config['token']) {
   print 'No config or valid token.';
   die();
 }
 
-$show_routes = PLATOFRMSH2SLACK_VERBOSE_ROUTES;
-$show_configurations = PLATOFRMSH2SLACK_VERBOSE_CONFIGURATIONS;
+// Defaults can be overriden on the yaml file
+$defaults = array();
+
+// Color use for informational attachments
+$defaults['slack']['colors']['attachment'] = '#e8e8e8';
+
+$config = array_replace_recursive($defaults, $config);
+
+print_r($config);
+
+$show_routes = $config['routes'];
+$show_configurations = $config['configurations'];
 
 function platformsh_trim_log($str) {
   return trim(preg_replace('/[\n]+[ ]*/s', "\n", $str), "\n ");
@@ -23,13 +39,13 @@ if (!empty($platformsh)) {
   // Default settings
   $settings = [
     'username' => 'Platform.sh',
-    'channel' => PLATOFRMSH2SLACK_SLACK_CHANNEL,
+    'channel' => $config['slack']['channel'],
     'icon' => 'https://pbs.twimg.com/profile_images/515156001591283712/UCMw85fT.png',
   ];
 
   // Instantiate slack client
   $client = new Maknz\Slack\Client(
-    PLATOFRMSH2SLACK_SLACK_URL,
+    $config['slack']['url'],
     $settings
   );
 
@@ -52,7 +68,7 @@ if (!empty($platformsh)) {
   $project = $platformsh->project;
 
   // Region/project url
-  $host = PLATOFRMSH2SLACK_HOST;
+  $host = $config['platformsh']['host'];
   $project_url = "https://$host/projects/$project/environments/$branch";
 
   // Commits
@@ -110,7 +126,7 @@ if (!empty($platformsh)) {
           'title' => 'SSL',
           'text' => "*CA: * {$platformsh->payload->domain->ssl->ca}\n*Expires: * {$platformsh->payload->domain->ssl->expires_on}",
           'fallback' => "CA: {$platformsh->payload->domain->ssl->ca}\n",
-          'color' => '#e8e8e8',
+          'color' => $config['slack']['colors']['attachment'],
           'mrkdwn_in' => array('text'),
         ));
       }
@@ -122,13 +138,13 @@ if (!empty($platformsh)) {
 
     default:
       $text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
-      if (PLATOFRMSH2SLACK_DEBUG) {
+      if ($config['debug']) {
         $filename = '/tmp/webhook.' . $platformsh->type . '.' . time() . '.json';
         file_put_contents($filename, $json);
         $message->attach(array(
           'text' => 'JSON saved to ' . $filename,
           'fallback' => 'JSON saved to ' . $filename,
-          'color' => '#e8e8e8',
+          'color' => $config['slack']['colors']['attachment'],
         ));
       }
       break;
@@ -148,7 +164,7 @@ if (!empty($platformsh)) {
       'title' => 'Environment configuration',
       'text' => $environment_configuration,
       'fallback' => $environment_configuration,
-      'color' => '#e8e8e8',
+      'color' => $config['slack']['colors']['attachment'],
     ));
   }
 
@@ -159,7 +175,7 @@ if (!empty($platformsh)) {
       'title' => 'Environment routes',
       'text' => $routes,
       'fallback' => $routes,
-      'color' => '#e8e8e8',
+      'color' => $config['slack']['colors']['attachment'],
     ));
   }
 

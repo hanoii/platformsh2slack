@@ -1,0 +1,34 @@
+# Define some secret token that needs to be present in the configured platform
+# webhook integration as a 'token' query string.
+# This is just a simple technique to prevent unauthorized access of this script
+token: 'some-secret-token'
+
+# The number of commit descriptions that you want to be included in the slack
+# message
+commit_limit: 10
+
+# Always show environment routes when present, otherwise will be shown
+# on some specific hooks
+routes: false
+
+# Always show environment configurations when present, otherwise will be shown
+# on some specific hooks
+configurations: false
+
+# This scripts is a WIP and as such, some webhooks could change or not be
+# currently known by the script.
+# A message about it is sent to slack but if you want, a temp file
+# with the json object could be saved to /tmp, so that this script can be
+# improved.
+debug: false
+
+platformsh:
+  # The platform region where your project is hosted
+  host: 'eu.platform.sh'
+
+slack:
+  # The slack incoming webhook URL.
+  url: 'https://hooks.slack.com/services/...'
+
+  # The channel where the message should be posted
+  channel: '#channel'
