@@ -23,8 +23,6 @@ $defaults['slack']['colors']['attachment'] = '#e8e8e8';
 
 $config = array_replace_recursive($defaults, $config);
 
-print_r($config);
-
 $show_routes = $config['routes'];
 $show_configurations = $config['configurations'];
 
