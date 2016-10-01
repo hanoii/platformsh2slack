@@ -23,7 +23,7 @@ hooks:
       )
 ```
 
-Please look at the [latest tagged release](../releases) and change the `--branch v0.3.1` above with it if it's not the latest.
+Please look at the [latest tagged release](../../releases) and change the `--branch v0.3.1` above with it if it's not the latest.
 
 ## Config file
 
