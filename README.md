@@ -3,8 +3,7 @@
 This is a simple php script that translates Platform.sh webhook into a Slack
 formatted message.
 
-You can install this in your php app container and host it there the project's
-specific webhooks.
+You can install this in your php app container and host it there for your project's specific webhooks.
 
 ![slack-example](https://cloud.githubusercontent.com/assets/677879/19004393/2aae68b4-872c-11e6-9ec4-52bbde84d849.png)
 
@@ -28,7 +27,7 @@ hooks:
 You can also specify a tag to the git clone command so that you can track versions:
 
 ```bash
-git --branch v0.1 clone https://github.com/hanoii/platformsh2slack.git /app/public/platformsh2slack
+git --branch v0.2 clone https://github.com/hanoii/platformsh2slack.git /app/public/platformsh2slack
 ```
 
 ## Config file
