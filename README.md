@@ -18,17 +18,12 @@ hooks:
     build: |
       (
         set -e
-        git clone https://github.com/hanoii/platformsh2slack.git /app/public/platformsh2slack
-        cd /app/public/platformsh2slack
-        composer install
+        git clone --branch v0.3.1 https://github.com/hanoii/platformsh2slack.git public/platformsh2slack
+        composer install -d public/platformsh2slack
       )
 ```
 
-You can also specify a tag to the git clone command so that you can track versions:
-
-```bash
-git --branch v0.2 clone https://github.com/hanoii/platformsh2slack.git /app/public/platformsh2slack
-```
+Please look at the [latest tagged release](releases) and change the `--branch v0.3.1` above with it.
 
 ## Config file
 
