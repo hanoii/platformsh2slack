@@ -98,6 +98,9 @@ if (!empty($platformsh)) {
 
     case 'environment.merge':
       $text = "$name merged branch `{$platformsh->parameters->from}` into `{$platformsh->parameters->into}` of <$project_url|$project>";
+      if ($platformsh->parameters->into == 'master') {
+        $show_configurations = true;
+      }
       break;
 
     case 'project.domain.update':
