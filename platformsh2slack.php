@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Platform.sh -> Slack adapter.
+ */
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -15,6 +19,13 @@ if (!file_exists($config_file)
   die();
 }
 
+/**
+ * Small trim utilizty for bits of the platfrom.sh log output
+ */
+function platformsh2slack_trim_log($str) {
+  return trim(preg_replace('/[\n]+[ ]*/s', "\n", $str), "\n ");
+}
+
 // Defaults can be overriden on the yaml file
 $defaults = array();
 
@@ -25,10 +36,6 @@ $config = array_replace_recursive($defaults, $config);
 
 $show_routes = $config['routes'];
 $show_configurations = $config['configurations'];
-
-function platformsh_trim_log($str) {
-  return trim(preg_replace('/[\n]+[ ]*/s', "\n", $str), "\n ");
-}
 
 $json = file_get_contents('php://input');
 $platformsh = json_decode($json);
@@ -157,7 +164,7 @@ if (!empty($platformsh)) {
 
   // Environment configuration
   if ($show_configurations && preg_match('/Environment configuration:(.*)Environment routes/s', $platformsh->log, $matches)) {
-    $environment_configuration = platformsh_trim_log($matches[1]);
+    $environment_configuration = platformsh2slack_trim_log($matches[1]);
     $message->attach(array(
       'title' => 'Environment configuration',
       'text' => $environment_configuration,
@@ -168,7 +175,7 @@ if (!empty($platformsh)) {
 
   // Environment routes
   if ($show_routes && preg_match('/Environment routes:(.*)/s', $platformsh->log, $matches)) {
-    $routes = platformsh_trim_log($matches[1]);
+    $routes = platformsh2slack_trim_log($matches[1]);
     $message->attach(array(
       'title' => 'Environment routes',
       'text' => $routes,
