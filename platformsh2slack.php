@@ -86,7 +86,7 @@ if (!empty($platformsh)) {
       $sha = substr($commit->sha, 0, 8);
       $commits[] = "$sha: {$commit->message} - {$commit->author->name}";
       $c++;
-      if ($c == PLATOFRMSH2SLACK_COMMIT_LIMIT) {
+      if ($c == $config['commit_limit']) {
         $commits[] = "... and more, only $c were shown.";
         break;
       }
