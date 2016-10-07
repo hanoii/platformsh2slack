@@ -141,6 +141,10 @@ if (!empty($platformsh)) {
       $text = "$name created the snapshot `{$platformsh->payload->backup_name}` from `$branch` of <$project_url|$project>";
       break;
 
+    case 'environment.deactivate':
+      $text = "$name deactivated the environment `$branch` of <$project_url|$project>";
+      break;
+
     default:
       $text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
       if ($config['debug']) {
