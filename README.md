@@ -20,7 +20,7 @@ hooks:
     build: |
       (
         set -e
-        git clone --branch v0.4 https://github.com/hanoii/platformsh2slack.git public/platformsh2slack
+        git clone --branch v0.4.1 https://github.com/hanoii/platformsh2slack.git public/platformsh2slack
         composer install -d public/platformsh2slack
       )
 ```
