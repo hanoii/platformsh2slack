@@ -124,6 +124,11 @@ if (!empty($platformsh)) {
       }
       break;
 
+    case 'environment.subscription.update':
+      $text = "$name updated the subscription of <$project_url|$project>";
+      $show_configurations = true;
+      break;
+
     case 'project.domain.update':
       $text = "$name updated domain `{$platformsh->payload->domain->name}` of <$project_url|$project>";
       if (!empty($platformsh->payload->domain->ssl->has_certificate)) {
