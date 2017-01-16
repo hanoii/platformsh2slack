@@ -129,6 +129,7 @@ if (!empty($platformsh)) {
       $show_configurations = true;
       break;
 
+    case 'project.domain.create':
     case 'project.domain.update':
       $text = "$name updated domain `{$platformsh->payload->domain->name}` of <$project_url|$project>";
       if (!empty($platformsh->payload->domain->ssl->has_certificate)) {
