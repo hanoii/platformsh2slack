@@ -1,4 +1,6 @@
 {
+    "name": "hanoii/platform2slack",
+    "description": "Platform.sh -> Slack incoming webhook adapter.",
     "require": {
         "maknz/slack": "^1.7",
         "symfony/yaml": "^3.1"
