@@ -1,5 +1,5 @@
 {
-    "name": "hanoii/platform2slack",
+    "name": "hanoii/platformsh2slack",
     "description": "Platform.sh -> Slack incoming webhook adapter.",
     "require": {
         "maknz/slack": "^1.7",
