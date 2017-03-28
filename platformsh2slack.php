@@ -10,6 +10,11 @@ use Symfony\Component\Yaml\Yaml;
 
 $config_file = 'platformsh2slack.yaml';
 
+// IF/when we output anything, help upstream not to cache anything.
+// Platform.sh payload will be POSTed, so it will normally won't hit a cache
+// but still
+header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+
 // Token simple auth and require config file
 if (!file_exists($config_file)
   || empty($_GET['token'])

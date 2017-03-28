@@ -20,12 +20,12 @@ hooks:
     build: |
       (
         set -e
-        git clone --branch v0.5 https://github.com/hanoii/platformsh2slack.git public/platformsh2slack
+        git clone --branch v0.6 https://github.com/hanoii/platformsh2slack.git public/platformsh2slack
         composer install -d public/platformsh2slack
       )
 ```
 
-Please look at the [latest tagged release](../../releases) and change the `--branch v0.3.1` above with it if it's not the latest.
+Please look at the [latest tagged release](../../releases) and change the `--branch v0.6` above with it if it's not the latest.
 
 ## Config file
 
@@ -46,7 +46,7 @@ And see `No config or valid token.` in the browser.
 
 ## Token
 
-One of the necessary configuration is a random token you need to define as `PLATOFRMSH2SLACK_TOKEN` in the config file. This is only to prevent possible unauthorized use of the script. Once you define it, you have to add it the url for the integration.
+One of the necessary configuration is a random token you need to set in the config file. This is only to prevent possible unauthorized use of the script. Once you define it, you have to add it the url for the integration.
 
 i.e. If you define:
 
