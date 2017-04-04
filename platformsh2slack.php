@@ -50,7 +50,7 @@ if (!empty($platformsh)) {
   $settings = [
     'username' => 'Platform.sh',
     'channel' => $config['slack']['channel'],
-    'icon' => 'https://pbs.twimg.com/profile_images/515156001591283712/UCMw85fT.png',
+    'icon' => 'https://raw.githubusercontent.com/hanoii/platformsh2slack/master/platformsh.png',
   ];
 
   // Instantiate slack client
