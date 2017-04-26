@@ -49,6 +49,18 @@ class Platformsh2Slack {
     }
   }
 
+  function send() {
+
+
+    // Make sure this request is never cached
+    $response = new Response();
+    $response->headers->addCacheControlDirective('no-cache');
+    $response->headers->addCacheControlDirective('must-revalidate');
+    $response->headers->addCacheControlDirective('proxy-revalidate');
+    $response->headers->addCacheControlDirective('max-age', 0);
+    $response->send();
+  }
+
   /**
   * Sample method
   *
