@@ -69,6 +69,8 @@ class Platformsh2Slack {
     if ($token != $this->request->query->get('token')) {
       $response = new Response('Invalid token', 403);
       $response->send();
+
+      throw new \RuntimeException();
     }
   }
 
@@ -78,6 +80,10 @@ class Platformsh2Slack {
 
     $json = $this->request->getContent();
     $platformsh = json_decode($json);
+
+    if (empty($platformsh)) {
+      throw new \RuntimeException();
+    }
 
     // Author name
     $name = $platformsh->payload->user->display_name;
@@ -176,7 +182,7 @@ class Platformsh2Slack {
       default:
         $text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
         if ($this->config['debug']) {
-          $filename = '/tmp/webhook.' . $platformsh->type . '.' . time() . '.json';
+          $filename = $this->config['debug'] . '/platformsh2slack.' . $platformsh->type . '.' . time() . '.json';
           file_put_contents($filename, $json);
           $this->slack->attach(array(
             'text' => 'JSON saved to ' . $filename,
