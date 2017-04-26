@@ -70,7 +70,7 @@ class Platformsh2Slack {
       $response = new Response('Invalid token', 403);
       $response->send();
 
-      throw new \RuntimeException();
+      throw new \RuntimeException('Invalid token');
     }
   }
 
@@ -82,7 +82,7 @@ class Platformsh2Slack {
     $platformsh = json_decode($json);
 
     if (empty($platformsh)) {
-      throw new \RuntimeException();
+      throw new \RuntimeException('Invalid Platform.sh webhook payload');
     }
 
     // Author name
