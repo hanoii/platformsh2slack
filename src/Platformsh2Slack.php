@@ -15,12 +15,14 @@ use Symfony\Component\HttpFoundation\Response;
 */
 class Platformsh2Slack {
 
-   /**  @var array $settings Instance settings */
-   private $config = [];
+  /**  @var array $settings Instance settings */
+  private $config = [];
 
-   private $request;
+  private $request;
 
-   private $slack;
+  private $slack_text = '';
+
+  private $slack;
 
   /**
    * Instantiate a new Webhook adapter
@@ -127,39 +129,40 @@ class Platformsh2Slack {
       ));
     }
 
+
     // Handle webhook
     switch ($platformsh->type) {
       case 'environment.push':
-        $text = "$name pushed $commits_count_str to branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name pushed $commits_count_str to branch `$branch` of <$project_url|$project>";
         if ($branch == 'master') {
           $show_configurations = true;
         }
         break;
 
       case 'environment.branch':
-        $text = "$name created a branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name created a branch `$branch` of <$project_url|$project>";
         $show_routes = true;
         break;
 
       case 'environment.delete':
-        $text = "$name deleted the branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name deleted the branch `$branch` of <$project_url|$project>";
         break;
 
       case 'environment.merge':
-        $text = "$name merged branch `{$platformsh->parameters->from}` into `{$platformsh->parameters->into}` of <$project_url|$project>";
+        $this->slack_text = "$name merged branch `{$platformsh->parameters->from}` into `{$platformsh->parameters->into}` of <$project_url|$project>";
         if ($platformsh->parameters->into == 'master') {
           $show_configurations = true;
         }
         break;
 
       case 'environment.subscription.update':
-        $text = "$name updated the subscription of <$project_url|$project>";
+        $this->slack_text = "$name updated the subscription of <$project_url|$project>";
         $show_configurations = true;
         break;
 
       case 'project.domain.create':
       case 'project.domain.update':
-        $text = "$name updated domain `{$platformsh->payload->domain->name}` of <$project_url|$project>";
+        $this->slack_text = "$name updated domain `{$platformsh->payload->domain->name}` of <$project_url|$project>";
         if (!empty($platformsh->payload->domain->ssl->has_certificate)) {
           $this->slack->attach(array(
             'title' => 'SSL',
@@ -172,15 +175,15 @@ class Platformsh2Slack {
         break;
 
       case 'environment.backup':
-        $text = "$name created the snapshot `{$platformsh->payload->backup_name}` from `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name created the snapshot `{$platformsh->payload->backup_name}` from `$branch` of <$project_url|$project>";
         break;
 
       case 'environment.deactivate':
-        $text = "$name deactivated the environment `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name deactivated the environment `$branch` of <$project_url|$project>";
         break;
 
       default:
-        $text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
         if ($this->config['debug']) {
           $filename = $this->config['debug'] . '/platformsh2slack.' . $platformsh->type . '.' . time() . '.json';
           file_put_contents($filename, $json);
@@ -227,7 +230,7 @@ class Platformsh2Slack {
 
     $this->processPlatformshPayload();
 
-    $this->slack->send();
+    $this->slack->send($this->slack_text);
 
     // Make sure this request is never cached
     $response = new Response();
