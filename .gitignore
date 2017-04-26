@@ -1,2 +1,3 @@
-platformsh2slack.yaml
 vendor/
+composer.lock
+.DS_Store
