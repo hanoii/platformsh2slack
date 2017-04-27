@@ -39,7 +39,7 @@ class Platformsh2Slack {
       'commit_limit' => 10,
       'routes' => false,
       'configurations' => false,
-      'attachment_color' => null,
+      'attachment_color' => '#e8e8e8',
       'debug' => null,
     ];
 
@@ -192,6 +192,36 @@ class Platformsh2Slack {
 
       case 'environment.deactivate':
         $this->slack_text = "$name deactivated the environment `$branch` of <$project_url|$project>";
+        break;
+
+      case 'environment.variable.create':
+        $this->slack_text = "$name created a variable on <$project_url|$project>";
+        if (!empty($platformsh->payload->variable)) {
+          $this->slack->attach(array(
+            'text' => "{$platformsh->payload->variable->name}: {$platformsh->payload->variable->value}",
+            'color' => '#345',
+          ));
+        }
+        break;
+
+      case 'environment.variable.update':
+        $this->slack_text = "$name updated a variable on <$project_url|$project>";
+        if (!empty($platformsh->payload->variable)) {
+          $this->slack->attach(array(
+            'text' => "{$platformsh->payload->variable->name}: {$platformsh->payload->variable->value}",
+            'color' => '#345',
+          ));
+        }
+        break;
+
+      case 'environment.variable.delete':
+        $this->slack_text = "$name deleted a variable on <$project_url|$project>";
+        if (!empty($platformsh->payload->variable)) {
+          $this->slack->attach(array(
+            'text' => "{$platformsh->payload->variable->name}",
+            'color' => '#345',
+          ));
+        }
         break;
 
       default:

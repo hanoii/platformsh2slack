@@ -22,6 +22,7 @@ Then [create an incoming webhook](https://my.slack.com/services/new/incoming-web
 ## Basic Usage
 
 ```php
+<?php
 
 // Optional settings
 $settings = [
@@ -69,7 +70,7 @@ Option | Type | Default | Description
 `commit_limit` | int | `10` | The number of commits from the payload to include in the Slack message 
 `routes` | bool | `false` | Whether to show project's routes on every slack message. If false, it will be shown only when you branch
 `configurations` | bool | `false` | Whether to show project's configurations on every slack message. If false, it will be shown only for master when you push, merge or have a subscription plan update.
-`attachment_color` | string | `null` | RGB color for Slack attachment.
+`attachment_color` | string | `'#e8e8e8'` | RGB color for Slack attachment.
 `debug` | string | `null` | An optional path where posssible unhandled webhooks JSON can be saved. This is useful if you want to send over the json for me to add support for it.
 
 ## Token
