@@ -28,20 +28,19 @@ class Platformsh2Slack {
    * Instantiate a new Webhook adapter
    *
    * @param string $slack_endpoint
-   * @param string $slack_channel
-   * @param string $region PLatform.sh region (us, eu)
    * @param array $settings
    * @return void
    */
-  function __construct($slack_endpoint, $slack_channel, $region, array $settings = []) {
+  function __construct($slack_endpoint, array $settings = []) {
     // Default settings
     $this->config = $settings + [
-      'region' => $region,
+      'channel' => null,
+      'region' => 'eu',
       'commit_limit' => 10,
       'routes' => false,
       'configurations' => false,
-      'debug' => false,
-      'attachment_color' => null
+      'attachment_color' => null,
+      'debug' => null,
     ];
 
     $this->request = Request::createFromGlobals();
@@ -49,9 +48,12 @@ class Platformsh2Slack {
     // Default settings
     $slack_settings = [
       'username' => 'Platform.sh',
-      'channel' => $slack_channel,
       'icon' => 'https://raw.githubusercontent.com/hanoii/platformsh2slack/master/platformsh.png',
     ];
+
+    if ($this->config['channel']) {
+      $slack_settings['channel'] = $this->config['channel'];
+    }
 
     // Instantiate slack client
     $client = new \Maknz\Slack\Client(
@@ -67,6 +69,13 @@ class Platformsh2Slack {
     return trim(preg_replace('/[\n]+[ ]*/s', "\n", $str), "\n ");
   }
 
+  /**
+  * Validate that a token is present in the request
+  *
+  * @param string $token Token to validate
+  *
+  * @return void
+  */
   function validateToken($token) {
     if ($token != $this->request->query->get('token')) {
       $response = new Response('Invalid token', 403);
@@ -76,6 +85,9 @@ class Platformsh2Slack {
     }
   }
 
+  /**
+  * Parse Platform.sh payload into Slack formatted message
+  */
   function processPlatformshPayload() {
     $show_routes = $this->config['routes'];
     $show_configurations = $this->config['configurations'];
@@ -226,6 +238,9 @@ class Platformsh2Slack {
     }
   }
 
+  /**
+  * Send formatted message to slack, making sure the response is not cached.
+  */
   function send() {
 
     $this->processPlatformshPayload();
@@ -240,18 +255,4 @@ class Platformsh2Slack {
     $response->headers->addCacheControlDirective('max-age', 0);
     $response->send();
   }
-
-  /**
-  * Sample method
-  *
-  * Always create a corresponding docblock for each method, describing what it is for,
-  * this helps the phpdocumentator to properly generator the documentation
-  *
-  * @param string $param1 A string containing the parameter, do this for each parameter to the function, make sure to make it descriptive
-  *
-  * @return string
-  */
-   public function method1($param1){
-      return "Hello World";
-   }
 }

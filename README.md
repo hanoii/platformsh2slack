@@ -9,66 +9,88 @@ Sponsored by [Infomagnet - builds websites to any design using Drupal](https://i
 
 ![slack-example](https://cloud.githubusercontent.com/assets/677879/19004393/2aae68b4-872c-11e6-9ec4-52bbde84d849.png)
 
-## Build hook
+## Installation
 
-You need to add something like the following to your app `.platform.app.yaml`:
+You can install the package using the [Composer](https://getcomposer.org/) package manager. You can install it by running this command in your project root:
 
-```yaml
-# The hooks executed at various points in the lifecycle of the application.
-hooks:
-    # We run deploy hook after your application has been deployed and started.
-    build: |
-      (
-        set -e
-        git clone --branch v0.6 https://github.com/hanoii/platformsh2slack.git public/platformsh2slack
-        composer install -d public/platformsh2slack
-      )
+```sh
+composer require hanoii/platformsh2slack
 ```
 
-Please look at the [latest tagged release](../../releases) and change the `--branch v0.6` above with it if it's not the latest.
+Then [create an incoming webhook](https://my.slack.com/services/new/incoming-webhook) on your Slack account for the package to use. You'll need the webhook URL to instantiate the adapter.
 
-## Config file
+## Basic Usage
 
-This scripts look for a `platformsh2slack.yaml` alongside the `platformsh2slack.php` script, you can either:
+```php
 
-- create it on another build hook
-- or add it to your repository and then add a line to the build hook to move it to where you cloned this repository. (i.e. /app/public/platformsh2slack)
+// Optional settings
+$settings = [
+  'channel' => '#random',
+  'region' => 'eu',
+];
 
-See the sample file for the required settings: [platformsh2slack.sample.yaml](platformsh2slack.sample.yaml)
+$platformsh2slack = new Hanoii\Platformsh2Slack\Platformsh2Slack(
+  'https://hooks.slack.com/...',
+  $settings
+);
 
-## Quick test
+// Optionally protect the request with a token that has to be present in the Platform.sh webhook
+$platformsh2slack->validateToken('1234');
 
-If all went ok, you should be able to access the script at your project's url:
+// Send the information to slack
+$platformsh2slack->send();
+```
 
-`http://PROJECTURL/platformsh2slack/platformsh2slack.php`
+## Platform.sh build hook
 
-And see `No config or valid token.` in the browser.
+If your application (`.platform.app.yaml`) is already being built with composer:
+
+```yaml
+build:
+    flavor: composer
+```
+
+You can simply add:
+
+```json
+    "hanoii/platformsh2slack": "^1.0"
+```
+
+To your `composer.json` file of the project.
+
+If not, you will have to add a script to the repository and run composer install on your build hook manually.
+
+## Settings
+
+Field | Type | Default | Description
+----- | ---- | ------- | -----------
+`channel` | string | `null` | The default channel that messages will be sent to, otherwise defaults to what's set on the Slack's incoming webhook
+`region` | string | `'eu'` | Platform.sh region where the project is hosted. This is used to build the links to the project. 
+`commit_limit` | int | `10` | The number of commits from the payload to include in the Slack message 
+`routes` | bool | `false` | Whether to show project's routes on every slack message. If false, it will be shown only when you branch
+`configurations` | bool | `false` | Whether to show project's configurations on every slack message. If false, it will be shown only for master when you push, merge or have a subscription plan update.
+`attachment_color` | string | `null` | RGB color for Slack attachment.
+`debug` | string | `null` | An optional path where posssible unhandled webhooks JSON can be saved. This is useful if you want to send over the json for me to add support for it.
 
 ## Token
 
-One of the necessary configuration is a random token you need to set in the config file. This is only to prevent possible unauthorized use of the script. Once you define it, you have to add it the url for the integration.
+This is an optional feature you can choose to use on the script. It's a nice simple validation so that you script is not abused.
 
-i.e. If you define:
+If you added:
 
-```yaml
-token: '1234'
+```php
+$platformsh2slack->validateToken('1234');
 ```
 
-You would use 
+to your script, you will have to append the token the Platform.sh's webhook integration URL.
 
-`http://PROJECTURL/platformsh2slack/platformsh2slack.php?token=1234`
-
-For your integration URL.
-
-## Add the integration
+## Add the integration on platform
 
 Run the following:
 
 ```bash
-platform integration:add --type=webhook --url="https://PROJECTURL/platformsh2slack/platformsh2slack.php?token=TOKEN"
+platform integration:add --type=webhook --url="https://www.example.com/platformsh2slack.php?token=TOKEN"
 ```
-
-Replacing **PROJECTURL** for your platform route and **TOKEN** with your defined token.
 
 ## Environoments
 
