@@ -56,13 +56,13 @@ You can simply add:
     "hanoii/platformsh2slack": "^1.0"
 ```
 
-To your `composer.json` file of the project.
+To your `composer.json` file of the project and create a small script as per above.
 
 If not, you will have to add a script to the repository and run composer install on your build hook manually.
 
 ## Settings
 
-Field | Type | Default | Description
+Option | Type | Default | Description
 ----- | ---- | ------- | -----------
 `channel` | string | `null` | The default channel that messages will be sent to, otherwise defaults to what's set on the Slack's incoming webhook
 `region` | string | `'eu'` | Platform.sh region where the project is hosted. This is used to build the links to the project. 
