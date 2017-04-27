@@ -1,8 +1,25 @@
 {
     "name": "hanoii/platformsh2slack",
     "description": "Platform.sh -> Slack incoming webhook adapter.",
+    "keywords": ["platformsh", "slack"],
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Ariel Barreiro",
+            "email": "mail@arielbarreiro.com.ar"
+        }
+    ],
+    "type": "project",
     "require": {
         "maknz/slack": "^1.7",
-        "symfony/yaml": "^3.1"
+        "symfony/http-foundation": "~2.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hanoii\\Platformsh2Slack\\": "src/"
+        }
     }
 }
