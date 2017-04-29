@@ -71,6 +71,7 @@ Option | Type | Default | Description
 `routes` | bool | `false` | Whether to show project's routes on every slack message. If false, it will be shown only when you branch
 `configurations` | bool | `false` | Whether to show project's configurations on every slack message. If false, it will be shown only for master when you push, merge or have a subscription plan update.
 `attachment_color` | string | `'#e8e8e8'` | RGB color for Slack attachment.
+`project` | string | `null` | If present, it will be used as the project name instead of the ID. Project name is misisng in Platform.sh's payload.
 `debug` | string | `null` | An optional path where posssible unhandled webhooks JSON can be saved. This is useful if you want to send over the json for me to add support for it.
 
 ## Token
