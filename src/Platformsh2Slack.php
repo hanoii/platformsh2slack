@@ -41,6 +41,7 @@ class Platformsh2Slack {
       'configurations' => false,
       'attachment_color' => '#e8e8e8',
       'debug' => null,
+      'project' => null,
     ];
 
     $this->request = Request::createFromGlobals();
@@ -117,6 +118,11 @@ class Platformsh2Slack {
     // Region/project url
     $host = $this->config['region'] . '.platform.sh';
     $project_url = "https://$host/projects/$project/environments/$branch";
+
+    // Optional project name
+    if ($this->config['project']) {
+      $project = $this->config['project'];
+    }
 
     // Commits
     if (!empty($platformsh->payload->commits_count)) {
