@@ -41,6 +41,7 @@ class Platformsh2Slack {
       'configurations' => false,
       'attachment_color' => '#e8e8e8',
       'debug' => null,
+      'debug_all' => false,
       'project' => null,
     ];
 
@@ -147,6 +148,7 @@ class Platformsh2Slack {
       ));
     }
 
+    $debug = false;
 
     // Handle webhook
     switch ($platformsh->type) {
@@ -201,40 +203,21 @@ class Platformsh2Slack {
         break;
 
       case 'environment.variable.create':
-        $this->slack_text = "$name created a variable on <$project_url|$project>";
-        if (!empty($platformsh->payload->variable)) {
-          $this->slack->attach(array(
-            'text' => "{$platformsh->payload->variable->name}: {$platformsh->payload->variable->value}",
-            'color' => '#345',
-          ));
-        }
+        $this->slack_text = "$name created variable `{$platformsh->payload->variable->name}` on <$project_url|$project>";
         break;
 
       case 'environment.variable.update':
-        $this->slack_text = "$name updated a variable on <$project_url|$project>";
-        if (!empty($platformsh->payload->variable)) {
-          $this->slack->attach(array(
-            'text' => "{$platformsh->payload->variable->name}: {$platformsh->payload->variable->value}",
-            'color' => '#345',
-          ));
-        }
+        $this->slack_text = "$name updated variable `{$platformsh->payload->variable->name}` on <$project_url|$project>";
         break;
 
       case 'environment.variable.delete':
-        $this->slack_text = "$name deleted a variable on <$project_url|$project>";
-        if (!empty($platformsh->payload->variable)) {
-          $this->slack->attach(array(
-            'text' => "{$platformsh->payload->variable->name}",
-            'color' => '#345',
-          ));
-        }
+        $this->slack_text = "$name deleted variable `{$platformsh->payload->variable->name}` on <$project_url|$project>";
         break;
 
       default:
         $this->slack_text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
         if ($this->config['debug']) {
-          $filename = $this->config['debug'] . '/platformsh2slack.' . $platformsh->type . '.' . time() . '.json';
-          file_put_contents($filename, $json);
+          $debug = true;
           $this->slack->attach(array(
             'text' => 'JSON saved to ' . $filename,
             'fallback' => 'JSON saved to ' . $filename,
@@ -242,6 +225,11 @@ class Platformsh2Slack {
           ));
         }
         break;
+    }
+
+    if ($debug || ($this->config['debug'] && $this->config['debug_all'])) {
+      $filename = $this->config['debug'] . '/platformsh2slack.' . $platformsh->type . '.' . time() . '.json';
+      file_put_contents($filename, $json);
     }
 
     // Result
