@@ -38,6 +38,8 @@ class Platformsh2Slack {
       'region' => 'eu',
       'commit_limit' => 10,
       'routes' => false,
+      'redirects' => false,
+      'basic_auth' => false,
       'configurations' => false,
       'attachment_color' => '#e8e8e8',
       'debug' => null,
@@ -92,7 +94,9 @@ class Platformsh2Slack {
   */
   function processPlatformshPayload() {
     $show_routes = $this->config['routes'];
+    $show_redirects = $this->config['redirects'];
     $show_configurations = $this->config['configurations'];
+    $show_basic_auth = $this->config['basic_auth'];
 
     $json = $this->request->getContent();
     $platformsh = json_decode($json);
@@ -152,6 +156,21 @@ class Platformsh2Slack {
 
     // Handle webhook
     switch ($platformsh->type) {
+
+      case 'environment.activate':
+        $this->slack_text = "$name activated environment for branch `$branch` of <$project_url|$project>";
+        $show_configurations = true;
+        $show_routes = true;
+        $show_redirects = true;
+        $show_basic_auth = true;
+        break;
+
+      case 'environment.update.http_access':
+        $this->slack_text = "$name changed HTTP Authentication settings on environment `$branch` of <$project_url|$project>";
+        $show_routes = true;
+        $show_basic_auth = true;
+        break;
+
       case 'environment.push':
         $this->slack_text = "$name pushed $commits_count_str to branch `$branch` of <$project_url|$project>";
         if ($branch == 'master') {
@@ -162,6 +181,8 @@ class Platformsh2Slack {
       case 'environment.branch':
         $this->slack_text = "$name created a branch `$branch` of <$project_url|$project>";
         $show_routes = true;
+        $show_redirects = true;
+        $show_basic_auth = true;
         break;
 
       case 'environment.delete':
@@ -240,7 +261,7 @@ class Platformsh2Slack {
     ));
 
     // Environment configuration
-    if ($show_configurations && preg_match('/Environment configuration:(.*)Environment routes/s', $platformsh->log, $matches)) {
+    if ($show_configurations && preg_match('/Environment configuration:?(.*)Environment routes/s', $platformsh->log, $matches)) {
       $environment_configuration = $this->trim($matches[1]);
       $this->slack->attach(array(
         'title' => 'Environment configuration',
@@ -251,14 +272,79 @@ class Platformsh2Slack {
     }
 
     // Environment routes
-    if ($show_routes && preg_match('/Environment routes:(.*)/s', $platformsh->log, $matches)) {
-      $routes = $this->trim($matches[1]);
-      $this->slack->attach(array(
-        'title' => 'Environment routes',
-        'text' => $routes,
-        'fallback' => $routes,
-        'color' => $this->config['attachment_color'],
-      ));
+    if ($show_routes && !empty($platformsh->payload->deployment->routes)) {
+      $routes_fields = $redirects = [];
+      $routes_fallback = $redirects_fallback = '';
+      foreach ($platformsh->payload->deployment->routes as $destination => $route) {
+        // Only show upstream routes, not redirects.
+        if ($route->type == 'upstream') {
+          $name = "URL for `{$route->upstream}`";
+          $routes_fields[] = [
+            'title' => $name,
+            'value' => $destination,
+          ];
+          $routes_fallback .= "- {$name}: {$destination}\n";
+        }
+        if ($show_redirects && $route->type == 'redirect') {
+          $redirects[] = $destination;
+        }
+      }
+      if (!empty($redirects)) {
+        $once = false;
+        foreach ($redirects as $destination) {
+          $redirect = [];
+          if (!$once) {
+            $redirect['title'] = 'Redirects';
+            $once = true;
+          }
+          $redirect['value'] = "{$destination}";
+          $routes_fields[] = $redirect;
+        }
+      }
+      if (!empty($routes_fields)) {
+        $this->slack->attach(array(
+          'title' => count($routes_fields) > 1 ? 'Environment routes' : '',
+          'text' => '',
+          'fallback' => $routes_fallback,
+          'fields' => $routes_fields,
+          'color' => $this->config['attachment_color'],
+        ));
+      }
+    }
+
+    // Basic authentication
+    if ($show_basic_auth && !empty($platformsh->payload->environment->http_access->is_enabled)) {
+      if (!empty($platformsh->payload->environment->http_access->basic_auth)) {
+
+        $basic_auth_fallback = '';
+        $basic_auth_fields = [];
+        $once = false;
+        foreach ($platformsh->payload->environment->http_access->basic_auth as $basic_auth_user => $basic_auth_pass) {
+          $user = $pass = [];
+          if (!$once) {
+            $user['title'] = 'Username';
+            $pass['title'] = 'Password';
+            $basic_auth_fallback .= "- *Username* / *Password*\n";
+            $once = true;
+          }
+          $user['value'] = $basic_auth_user;
+          $user['short'] = true;
+          $pass['value'] = $basic_auth_pass;
+          $pass['short'] = true;
+          $basic_auth_fields[] = $user;
+          $basic_auth_fields[] = $pass;
+          $basic_auth_fallback .= "- `$basic_auth_user` / `$basic_auth_pass`\n";
+        }
+        if (!empty($basic_auth_fields)) {
+          $this->slack->attach(array(
+            'title' => 'HTTP Authentication',
+            'text' => '',
+            'fallback' => $basic_auth_fallback,
+            'fields' => $basic_auth_fields,
+            'color' => $this->config['attachment_color'],
+          ));
+        }
+      }
     }
   }
 
