@@ -218,11 +218,6 @@ class Platformsh2Slack {
         $this->slack_text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
         if ($this->config['debug']) {
           $debug = true;
-          $this->slack->attach(array(
-            'text' => 'JSON saved to ' . $filename,
-            'fallback' => 'JSON saved to ' . $filename,
-            'color' => $this->config['attachment_color'],
-          ));
         }
         break;
     }
@@ -230,6 +225,11 @@ class Platformsh2Slack {
     if ($debug || ($this->config['debug'] && $this->config['debug_all'])) {
       $filename = $this->config['debug'] . '/platformsh2slack.' . $platformsh->type . '.' . time() . '.json';
       file_put_contents($filename, $json);
+      $this->slack->attach(array(
+        'text' => 'JSON saved to ' . $filename,
+        'fallback' => 'JSON saved to ' . $filename,
+        'color' => $this->config['attachment_color'],
+      ));
     }
 
     // Result
