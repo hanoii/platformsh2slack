@@ -171,6 +171,33 @@ class Platformsh2Slack {
         $show_basic_auth = true;
         break;
 
+      case 'environment.access.add':
+        $this->slack_text = "$name added {$platformsh->payload->access->display_name} to `$branch` of <$project_url|$project>";
+        break;
+
+      case 'environment.access.remove':
+        $this->slack_text = "$name removed {$platformsh->payload->access->display_name} from `$branch` of <$project_url|$project>";
+        break;
+
+      case 'environment.redeploy':
+        $this->slack_text = "$name redeployed environment `$branch` of <$project_url|$project>";
+        break;
+
+      case 'environment.synchronize':
+        $parent = $platformsh->parameters->from;
+        $child = $platformsh->parameters->into;
+        if ($platformsh->parameters->synchronize_code) {
+          $payload[] = '*code*';
+        }
+        if ($platformsh->parameters->synchronize_data) {
+          $payload[] = '*data & files*';
+        }
+
+        $payload = implode(', ', $payload);
+
+        $this->slack_text = "$name synchronized $payload from `$parent` into `$child` environment of <$project_url|$project>";
+        break;
+
       case 'environment.push':
         $this->slack_text = "$name pushed $commits_count_str to branch `$branch` of <$project_url|$project>";
         if ($branch == 'master') {
