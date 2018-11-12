@@ -378,6 +378,15 @@ class Platformsh2Slack {
           ));
         }
       }
+
+      if ($platformsh->result != 'success') {
+        $this->slack->attach(array(
+          'title' => 'Build log',
+          'text' => $platformsh->log,
+          'fallback' => $platformsh->log,
+          'color' => 'danger',
+        ));
+      }
     }
   }
 
