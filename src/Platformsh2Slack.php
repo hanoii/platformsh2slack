@@ -264,6 +264,12 @@ class Platformsh2Slack {
 
       default:
         $this->slack_text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
+        $this->slack->attach(array(
+          'title' => 'Description',
+          'color' => $this->config['attachment_color'],
+          'text' => strip_tags($platformsh->description),
+          'fallback' => strip_tags($platformsh->description),
+        ));
         if ($this->config['debug']) {
           $debug = true;
           $this->slack->attach(array(
