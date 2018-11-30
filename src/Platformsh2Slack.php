@@ -43,6 +43,7 @@ class Platformsh2Slack {
       'debug' => null,
       'debug_all' => false,
       'project' => null,
+      'to_username' => null,
     ];
 
     $this->request = Request::createFromGlobals();
@@ -230,6 +231,11 @@ class Platformsh2Slack {
     if ($debug || ($this->config['debug'] && $this->config['debug_all'])) {
       $filename = $this->config['debug'] . '/platformsh2slack.' . $platformsh->type . '.' . time() . '.json';
       file_put_contents($filename, $json);
+    }
+
+    if(!empty($this->config['to_username'])){
+      $mention = '@'.trim($this->config['to_username']);
+      $this->slack_text = $mention.' '.$this->slack_text;
     }
 
     // Result
