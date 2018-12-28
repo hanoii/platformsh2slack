@@ -68,7 +68,9 @@ Option | Type | Default | Description
 `channel` | string | `null` | The default channel that messages will be sent to, otherwise defaults to what's set on the Slack's incoming webhook
 `region` | string | `'eu'` | Platform.sh region where the project is hosted. This is used to build the links to the project. 
 `commit_limit` | int | `10` | The number of commits from the payload to include in the Slack message 
-`routes` | bool | `false` | Whether to show project's routes on every slack message. If false, it will be shown only when you branch
+`routes` | bool | `false` | Whether to show project's routes on every slack message. If false, it will be shown only when you branch.
+`redirects` | bool | `false` | Whether to include project's redirects with routes on every Slack message. If false, redirects will be shown only when you branch.
+`basic_auth` | bool | `false` | Whether to show project environment's HTTP Authentication username and password in Slack message.  WARNING: If true, potentially sensitive data passwords will be sent in the clear to your Slack channel.
 `configurations` | bool | `false` | Whether to show project's configurations on every slack message. If false, it will be shown only for master when you push, merge or have a subscription plan update.
 `attachment_color` | string | `'#e8e8e8'` | RGB color for Slack attachment.
 `project` | string | `null` | If present, it will be used as the project name instead of the ID. Project name is misisng in Platform.sh's payload.
