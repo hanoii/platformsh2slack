@@ -280,7 +280,7 @@ class Platformsh2Slack {
     }
 
     if ($debug || ($this->config['debug'] && $this->config['debug_all'])) {
-      $filename = $this->config['debug'] . '/platformsh2slack.' . $platformsh->type . '.' . time() . '.json';
+      $filename = $this->config['debug'] . '/platformsh2slack.' . $platformsh->type . '.' . time() . '.' . rand(1000, 9999) . '.json';
       file_put_contents($filename, $json);
       $this->slack->attach(array(
         'text' => 'JSON saved to ' . $filename,
