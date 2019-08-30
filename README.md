@@ -28,7 +28,8 @@ Then [create an incoming webhook](https://my.slack.com/services/new/incoming-web
 $settings = [
   'channel' => '#random',
   'project' => 'Some project',
-  'project_url' => 'https://console.platform.sh/',
+  // Environment will be appended to the URL
+  'project_url' => 'https://console.platform.sh/USER/PROJECTID',
 ];
 
 $platformsh2slack = new Hanoii\Platformsh2Slack\Platformsh2Slack(
@@ -74,7 +75,7 @@ Option | Type | Default | Description
 `configurations` | bool | `false` | Whether to show project's configurations on every slack message. If false, it will be shown only for master when you push, merge or have a subscription plan update.
 `attachment_color` | string | `'#e8e8e8'` | RGB color for Slack attachment.
 `project` | string | `null` | If present, it will be used as the project name instead of the default string. Project name is misisng in Platform.sh's payload.
-`project_url` | string | `null` | If present, the project name will be used as a link to this URL on Slack notifications.
+`project_url` | string | `null` | If present, the project name will be used as a link to this URL on Slack notifications. Environment branch will be appended automatically to the URL.
 `debug` | string | `null` | An optional path where posssible unhandled webhooks JSON can be saved. This is useful if you want to send over the json for me to add support for it.
 `debug_all` | boolean | `false` | If `debug` is set, it saves the JSON of every webhook sent, not only the unhandled ones.
 

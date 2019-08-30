@@ -127,7 +127,8 @@ class Platformsh2Slack {
       $project_string = $this->config['project'];
     }
     if ($this->config['project_url']) {
-      $url = $this->config['project_url'];
+      $url = trim($this->config['project_url'], '/');
+      $url .= "/$branch";
       $project_string = "<$url|$project_string>";
     }
 
