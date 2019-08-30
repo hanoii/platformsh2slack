@@ -35,7 +35,6 @@ class Platformsh2Slack {
     // Default settings
     $this->config = $settings + [
       'channel' => null,
-      'region' => 'eu',
       'commit_limit' => 10,
       'routes' => false,
       'redirects' => false,
@@ -45,6 +44,7 @@ class Platformsh2Slack {
       'debug' => null,
       'debug_all' => false,
       'project' => null,
+      'project_url' => null,
     ];
 
     $this->request = Request::createFromGlobals();
@@ -118,15 +118,17 @@ class Platformsh2Slack {
     }
 
     // Project
-    $project = $platformsh->project;
+    $project_id = $platformsh->project;
 
-    // Region/project url
-    $host = $this->config['region'] . '.platform.sh';
-    $project_url = "https://$host/projects/$project/environments/$branch";
-
-    // Optional project name
+    // Project string identifier
+    //
+    $project_string = 'Platform.sh';
     if ($this->config['project']) {
-      $project = $this->config['project'];
+      $project_string = $this->config['project'];
+    }
+    if ($this->config['project_url']) {
+      $url = $this->config['project_url'];
+      $project_string = "<$url|$project_string>";
     }
 
     // Commits
@@ -158,7 +160,7 @@ class Platformsh2Slack {
     switch ($platformsh->type) {
 
       case 'environment.activate':
-        $this->slack_text = "$name activated environment for branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name activated environment for branch `$branch` of $project_string";
         $show_configurations = true;
         $show_routes = true;
         $show_redirects = true;
@@ -166,21 +168,21 @@ class Platformsh2Slack {
         break;
 
       case 'environment.update.http_access':
-        $this->slack_text = "$name changed HTTP Authentication settings on environment `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name changed HTTP Authentication settings on environment `$branch` of $project_string";
         $show_routes = true;
         $show_basic_auth = true;
         break;
 
       case 'environment.access.add':
-        $this->slack_text = "$name added {$platformsh->payload->access->display_name} to `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name added {$platformsh->payload->access->display_name} to `$branch` of $project_string";
         break;
 
       case 'environment.access.remove':
-        $this->slack_text = "$name removed {$platformsh->payload->access->display_name} from `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name removed {$platformsh->payload->access->display_name} from `$branch` of $project_string";
         break;
 
       case 'environment.redeploy':
-        $this->slack_text = "$name redeployed environment `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name redeployed environment `$branch` of $project_string";
         break;
 
       case 'environment.synchronize':
@@ -195,42 +197,42 @@ class Platformsh2Slack {
 
         $payload = implode(', ', $payload);
 
-        $this->slack_text = "$name synchronized $payload from `$parent` into `$child` environment of <$project_url|$project>";
+        $this->slack_text = "$name synchronized $payload from `$parent` into `$child` environment of $project_string";
         break;
 
       case 'environment.push':
-        $this->slack_text = "$name pushed $commits_count_str to branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name pushed $commits_count_str to branch `$branch` of $project_string";
         if ($branch == 'master') {
           $show_configurations = true;
         }
         break;
 
       case 'environment.branch':
-        $this->slack_text = "$name created a branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name created a branch `$branch` of $project_string";
         $show_routes = true;
         $show_redirects = true;
         $show_basic_auth = true;
         break;
 
       case 'environment.delete':
-        $this->slack_text = "$name deleted the branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name deleted the branch `$branch` of $project_string";
         break;
 
       case 'environment.merge':
-        $this->slack_text = "$name merged branch `{$platformsh->parameters->from}` into `{$platformsh->parameters->into}` of <$project_url|$project>";
+        $this->slack_text = "$name merged branch `{$platformsh->parameters->from}` into `{$platformsh->parameters->into}` of $project_string";
         if ($platformsh->parameters->into == 'master') {
           $show_configurations = true;
         }
         break;
 
       case 'environment.subscription.update':
-        $this->slack_text = "$name updated the subscription of <$project_url|$project>";
+        $this->slack_text = "$name updated the subscription of $project_string";
         $show_configurations = true;
         break;
 
       case 'project.domain.create':
       case 'project.domain.update':
-        $this->slack_text = "$name updated domain `{$platformsh->payload->domain->name}` of <$project_url|$project>";
+        $this->slack_text = "$name updated domain `{$platformsh->payload->domain->name}` of $project_string";
         if (!empty($platformsh->payload->domain->ssl->has_certificate)) {
           $this->slack->attach(array(
             'title' => 'SSL',
@@ -243,27 +245,27 @@ class Platformsh2Slack {
         break;
 
       case 'environment.backup':
-        $this->slack_text = "$name created the snapshot `{$platformsh->payload->backup_name}` from `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name created the snapshot `{$platformsh->payload->backup_name}` from `$branch` of $project_string";
         break;
 
       case 'environment.deactivate':
-        $this->slack_text = "$name deactivated the environment `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name deactivated the environment `$branch` of $project_string";
         break;
 
       case 'environment.variable.create':
-        $this->slack_text = "$name created variable `{$platformsh->payload->variable->name}` on <$project_url|$project>";
+        $this->slack_text = "$name created variable `{$platformsh->payload->variable->name}` on $project_string";
         break;
 
       case 'environment.variable.update':
-        $this->slack_text = "$name updated variable `{$platformsh->payload->variable->name}` on <$project_url|$project>";
+        $this->slack_text = "$name updated variable `{$platformsh->payload->variable->name}` on $project_string";
         break;
 
       case 'environment.variable.delete':
-        $this->slack_text = "$name deleted variable `{$platformsh->payload->variable->name}` on <$project_url|$project>";
+        $this->slack_text = "$name deleted variable `{$platformsh->payload->variable->name}` on $project_string";
         break;
 
       default:
-        $this->slack_text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of <$project_url|$project>";
+        $this->slack_text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of $project_string";
         $this->slack->attach(array(
           'title' => 'Description',
           'color' => $this->config['attachment_color'],
