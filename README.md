@@ -78,6 +78,7 @@ Option | Type | Default | Description
 `project_url` | string | `null` | If present, the project name will be used as a link to this URL on Slack notifications. Environment branch will be appended automatically to the URL.
 `debug` | string | `null` | An optional path where posssible unhandled webhooks JSON can be saved. This is useful if you want to send over the json for me to add support for it.
 `debug_all` | boolean | `false` | If `debug` is set, it saves the JSON of every webhook sent, not only the unhandled ones.
+`active` | boolean | `false` | If `active` is set, only webhooks of active environments will be sent to platform. Useful for some external integrations.
 
 ## Token
 

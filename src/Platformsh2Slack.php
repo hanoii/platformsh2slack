@@ -45,6 +45,7 @@ class Platformsh2Slack {
       'debug_all' => false,
       'project' => null,
       'project_url' => null,
+      'active' => false,
     ];
 
     $this->request = Request::createFromGlobals();
@@ -115,6 +116,16 @@ class Platformsh2Slack {
     }
     else if (!empty($platformsh->payload->environment->name)) {
       $branch = $platformsh->payload->environment->name;
+    }
+
+    // Active
+    $active = true;
+    if (!empty($platformsh->payload->environment->status) && $platformsh->payload->environment->status != 'active') {
+      $active = false;
+    }
+    // If only active and not active, do nothing.
+    if ($this->config['active'] && !$active) {
+      return;
     }
 
     // Project
