@@ -134,6 +134,9 @@ class Platformsh2Slack {
     // Project string identifier
     //
     $project_string = 'Platform.sh';
+    if (!empty($platformsh->payload->project->title)) {
+      $project_string = $platformsh->payload->project->title;
+    }
     if ($this->config['project']) {
       $project_string = $this->config['project'];
     }
