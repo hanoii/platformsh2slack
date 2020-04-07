@@ -75,7 +75,7 @@ Option | Type | Default | Description
 `configurations` | bool | `false` | Whether to show project's configurations on every slack message. If false, it will be shown only for master when you push, merge or have a subscription plan update.
 `attachment_color` | string | `'#e8e8e8'` | RGB color for Slack attachment.
 `project` | string | `null` | If present, it will be used as the project title instead of the default.
-`project_url` | string | `null` | If present, the project name will be used as a link to this URL on Slack notifications. Environment branch will be appended automatically to the URL.
+`project_url` | string | `null` | If present, the project title will link to this URL instead of the default for Slack notifications. Environment branch will be appended automatically to the URL. If empty, the default project link will be used: `https://console.platform.sh/project/{project_id}`.
 `debug` | string | `null` | An optional path where posssible unhandled webhooks JSON can be saved. This is useful if you want to send over the json for me to add support for it.
 `debug_all` | boolean | `false` | If `debug` is set, it saves the JSON of every webhook sent, not only the unhandled ones.
 `active` | boolean | `false` | If `active` is set, only webhooks of active environments will be sent to platform. Useful for some external integrations.

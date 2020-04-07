@@ -145,6 +145,10 @@ class Platformsh2Slack {
       $url .= "/$branch";
       $project_string = "<$url|$project_string>";
     }
+    else {
+      $url = "https://console.platform.sh/project/$project_id/$branch";
+      $project_string = "<$url|$project_string>";
+    }
 
     // Commits
     if (!empty($platformsh->payload->commits_count)) {
