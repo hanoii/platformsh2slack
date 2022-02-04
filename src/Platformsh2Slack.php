@@ -277,14 +277,14 @@ class Platformsh2Slack {
         break;
 
       default:
-        $this->slack_text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of $project_string";
-        $this->slack->attach(array(
-          'title' => 'Description',
-          'color' => $this->config['attachment_color'],
-          'text' => strip_tags($platformsh->description),
-          'fallback' => strip_tags($platformsh->description),
-        ));
         if ($this->config['debug']) {
+          $this->slack_text = "$name triggerred an unhandled webhook `{$platformsh->type}` to branch `$branch` of $project_string";
+          $this->slack->attach(array(
+            'title' => 'Description',
+            'color' => $this->config['attachment_color'],
+            'text' => strip_tags($platformsh->description),
+            'fallback' => strip_tags($platformsh->description),
+          ));
           $debug = true;
         }
         break;
