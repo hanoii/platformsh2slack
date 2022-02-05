@@ -24,6 +24,8 @@ class Platformsh2Slack {
 
   private $slack;
 
+  private $send = TRUE;
+
   /**
    * Instantiate a new Webhook adapter
    *
@@ -287,6 +289,9 @@ class Platformsh2Slack {
           ));
           $debug = true;
         }
+        else {
+          $this->send = FALSE;
+        }
         break;
     }
 
@@ -411,7 +416,9 @@ class Platformsh2Slack {
 
     $this->processPlatformshPayload();
 
-    $this->slack->send($this->slack_text);
+    if ($this->send) {
+      $this->slack->send($this->slack_text);
+    }
 
     // Make sure this request is never cached
     $response = new Response();
