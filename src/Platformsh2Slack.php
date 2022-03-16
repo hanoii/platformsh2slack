@@ -262,6 +262,10 @@ class Platformsh2Slack {
         $this->slack_text = "$name created the snapshot `{$platformsh->payload->backup_name}` from `$branch` of $project_string";
         break;
 
+      case 'environment.backup.delete':
+        $this->slack_text = "$name deleted the snapshot `{$platformsh->payload->backup_name}` from `$branch` of $project_string";
+        break;
+
       case 'environment.deactivate':
         $this->slack_text = "$name deactivated the environment `$branch` of $project_string";
         break;
