@@ -12,7 +12,7 @@
     "type": "project",
     "require": {
         "maknz/slack": "^1.7",
-        "symfony/http-foundation": "^2 || ^3 || ^4"
+        "symfony/http-foundation": "^2 || ^3 || ^4 || ^6 || ^7"
     },
     "autoload": {
         "psr-4": {
