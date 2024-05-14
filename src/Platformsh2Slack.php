@@ -136,12 +136,19 @@ class Platformsh2Slack {
     // Project string identifier
     //
     $project_string = 'Platform.sh';
+    if (!empty($platformsh->payload->project->title)) {
+      $project_string = $platformsh->payload->project->title;
+    }
     if ($this->config['project']) {
       $project_string = $this->config['project'];
     }
     if ($this->config['project_url']) {
       $url = trim($this->config['project_url'], '/');
       $url .= "/$branch";
+      $project_string = "<$url|$project_string>";
+    }
+    else {
+      $url = "https://console.platform.sh/project/$project_id/$branch";
       $project_string = "<$url|$project_string>";
     }
 
