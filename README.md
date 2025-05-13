@@ -1,5 +1,8 @@
 # Platform.sh -> Slack incoming webhook adapter
 
+> [!NOTE]
+> This project has been archived. There's a better way of doing something like this which is through [activity scripts](https://docs.platform.sh/integrations/activity.html).
+
 This is a simple php script that translates [Platform.sh](https://platform.sh) webhook into a [Slack](http://slack.com/)
 formatted message.
 
